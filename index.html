@@ -55,7 +55,6 @@
         }
     </script>
     <style>
-        /* Плавные анимации для появления записей и уведомлений */
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -63,7 +62,6 @@
         .animate-slide-in {
             animation: slideIn 0.25s ease-out forwards;
         }
-        /* Стилизация скроллбара */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -81,7 +79,7 @@
     <!-- Уведомление (Toast) -->
     <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none w-11/12 max-w-sm"></div>
 
-    <!-- Модальное окно подтверждения (вместо confirm) -->
+    <!-- Модальное окно подтверждения -->
     <div id="confirm-modal" class="fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-xl border border-stone-100 animate-slide-in">
             <h3 id="modal-title" class="font-display text-xl font-bold text-stone-800 mb-2">Подтверждение</h3>
@@ -91,7 +89,7 @@
                     Отмена
                 </button>
                 <button id="modal-confirm" class="flex-1 py-3 px-4 rounded-2xl bg-rose-500 hover:bg-rose-600 font-semibold text-white shadow-sm transition">
-                    Удалить
+                    Подтвердить
                 </button>
             </div>
         </div>
@@ -104,7 +102,6 @@
         <header class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center text-white shadow-md shadow-orange-200">
-                    <!-- Иконка лапки SVG -->
                     <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 10c-2.21 0-4 1.79-4 4 0 1.66 1.34 3 3 3h2c1.66 0 3-1.34 3-3 0-2.21-1.79-4-4-4zm-6.5-1C6.88 9 8 7.88 8 6.5S6.88 4 5.5 4 3 5.12 3 6.5 4.12 9 5.5 9zm4-3C10.88 6 12 4.88 12 3.5S10.88 1 9.5 1 7 2.12 7 3.5 8.12 6 9.5 6zm5 0c1.38 0 2.5-1.12 2.5-2.5S15.88 1 14.5 1 12 2.12 12 3.5 13.12 6 14.5 6zm4 3c1.38 0 2.5-1.12 2.5-2.5S19.88 4 18.5 4 16 5.12 16 6.5 17.12 9 18.5 9z"/>
                     </svg>
@@ -115,15 +112,17 @@
                 </div>
             </div>
 
-            <!-- Кнопки экспорта -->
+            <!-- Кнопки Копия и Импорт -->
             <div class="flex gap-1.5">
-                <button onclick="exportData('csv')" title="Скачать таблицу CSV" class="p-2.5 rounded-xl bg-white hover:bg-stone-50 text-stone-600 border border-stone-200/80 shadow-xs text-xs font-semibold flex items-center gap-1 transition active:scale-95">
+                <button onclick="exportData('json')" title="Скачать резервную копию" class="p-2.5 rounded-xl bg-white hover:bg-stone-50 text-stone-600 border border-stone-200/80 shadow-xs text-xs font-semibold flex items-center gap-1 transition active:scale-95">
                     <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    <span>CSV</span>
+                    <span>Копия</span>
                 </button>
-                <button onclick="exportData('json')" title="Скачать резервную копию JSON" class="p-2.5 rounded-xl bg-white hover:bg-stone-50 text-stone-600 border border-stone-200/80 shadow-xs text-xs font-semibold flex items-center gap-1 transition active:scale-95">
-                    <span>JSON</span>
+                <button onclick="document.getElementById('import-file').click()" title="Загрузить из файла JSON" class="p-2.5 rounded-xl bg-white hover:bg-stone-50 text-stone-600 border border-stone-200/80 shadow-xs text-xs font-semibold flex items-center gap-1 transition active:scale-95">
+                    <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    <span>Импорт</span>
                 </button>
+                <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
             </div>
         </header>
 
@@ -139,11 +138,9 @@
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2">1. Выберите котика</label>
                     <div class="grid grid-cols-2 gap-3">
-                        <!-- Кнопка Компот -->
                         <button type="button" id="btn-cat-kompot" onclick="selectCat('Компот')" 
                             class="cat-btn relative flex flex-col items-center justify-center p-3.5 rounded-2xl border-2 transition-all duration-150 active:scale-95 bg-kompot-light border-kompot text-kompot-dark shadow-xs">
                             <div class="w-12 h-12 rounded-full bg-orange-200/80 flex items-center justify-center mb-1.5 text-2xl">
-                                <!-- SVG Рыжий кот -->
                                 <svg class="w-8 h-8 text-orange-600" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M12 3c-1.5 0-2.9.4-4.1 1.1L5 2v5.2C3.8 8.6 3 10.4 3 12.5 3 17.2 7 21 12 21s9-3.8 9-8.5c0-2.1-.8-3.9-2-5.3V2l-2.9 2.1C14.9 3.4 13.5 3 12 3zm-3 8.5c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5zm6 0c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5zm-3 4.5c1.1 0 2 .6 2 1.2 0 .5-.9.8-2 .8s-2-.3-2-.8c0-.6.9-1.2 2-1.2z"/>
                                 </svg>
@@ -152,11 +149,9 @@
                             <span class="check-badge absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-kompot text-white flex items-center justify-center text-xs">✓</span>
                         </button>
 
-                        <!-- Кнопка Коржик -->
                         <button type="button" id="btn-cat-korzhik" onclick="selectCat('Коржик')" 
                             class="cat-btn relative flex flex-col items-center justify-center p-3.5 rounded-2xl border-2 transition-all duration-150 active:scale-95 bg-stone-50 border-stone-200 text-stone-600 hover:bg-amber-50/50">
                             <div class="w-12 h-12 rounded-full bg-amber-200/70 flex items-center justify-center mb-1.5 text-2xl">
-                                <!-- SVG Песочный кот -->
                                 <svg class="w-8 h-8 text-amber-600" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M12 3c-1.5 0-2.9.4-4.1 1.1L5 2v5.2C3.8 8.6 3 10.4 3 12.5 3 17.2 7 21 12 21s9-3.8 9-8.5c0-2.1-.8-3.9-2-5.3V2l-2.9 2.1C14.9 3.4 13.5 3 12 3zm-3 8.5c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5zm6 0c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5zm-3 4.5c1.1 0 2 .6 2 1.2 0 .5-.9.8-2 .8s-2-.3-2-.8c0-.6.9-1.2 2-1.2z"/>
                                 </svg>
@@ -171,11 +166,9 @@
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2">2. Куда сходил пописать?</label>
                     <div class="grid grid-cols-2 gap-3">
-                        <!-- Кнопка Унитаз -->
                         <button type="button" id="btn-place-toilet" onclick="selectPlace('Унитаз')" 
                             class="place-btn relative flex items-center gap-3 p-3.5 rounded-2xl border-2 transition-all duration-150 active:scale-95 bg-toilet-light border-toilet text-toilet-dark shadow-xs">
                             <div class="w-10 h-10 rounded-xl bg-sky-200/80 flex items-center justify-center shrink-0">
-                                <!-- SVG Унитаз -->
                                 <svg class="w-6 h-6 text-sky-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M7 12h13a1 1 0 0 1 1 1 5 5 0 0 1-5 5h-.598a.5.5 0 0 0-.424.765l1.544 2.47a.5.5 0 0 1-.424.765H5.402a.5.5 0 0 1-.424-.765L7 18"/>
                                     <path d="M8 18a5 5 0 0 1-5-5V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8"/>
@@ -187,11 +180,9 @@
                             </div>
                         </button>
 
-                        <!-- Кнопка Лоток -->
                         <button type="button" id="btn-place-litter" onclick="selectPlace('Лоток')" 
                             class="place-btn relative flex items-center gap-3 p-3.5 rounded-2xl border-2 transition-all duration-150 active:scale-95 bg-stone-50 border-stone-200 text-stone-600 hover:bg-emerald-50/50">
                             <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
-                                <!-- SVG Лоток -->
                                 <svg class="w-6 h-6 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M3 11l2 8h14l2-8H3z"/>
                                     <path d="M2 11h20"/>
@@ -260,7 +251,6 @@
                         </div>
                         <span id="stat-kompot-detail" class="text-xs font-medium text-stone-500">0 ун. / 0 лот.</span>
                     </div>
-                    <!-- Прогресс-бар -->
                     <div class="w-full h-2.5 bg-stone-100 rounded-full overflow-hidden">
                         <div id="bar-kompot" class="h-full bg-gradient-to-r from-sky-400 to-sky-500 rounded-full transition-all duration-500" style="width: 0%"></div>
                     </div>
@@ -282,7 +272,6 @@
                         </div>
                         <span id="stat-korzhik-detail" class="text-xs font-medium text-stone-500">0 ун. / 0 лот.</span>
                     </div>
-                    <!-- Прогресс-бар -->
                     <div class="w-full h-2.5 bg-stone-100 rounded-full overflow-hidden">
                         <div id="bar-korzhik" class="h-full bg-gradient-to-r from-sky-400 to-sky-500 rounded-full transition-all duration-500" style="width: 0%"></div>
                     </div>
@@ -298,7 +287,6 @@
                     <p class="text-xs text-stone-400">Динамика походов в унитаз и лоток</p>
                 </div>
 
-                <!-- Переключатель периода: 7 дней / 30 дней -->
                 <div class="flex bg-warmGray p-1 rounded-2xl border border-stone-200/60">
                     <button type="button" onclick="setChartPeriod(7)" data-chart-period="7"
                         class="chart-period-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-stone-800 shadow-xs transition">
@@ -344,33 +332,19 @@
                 <span id="chart-period-summary" class="font-semibold text-stone-600">0 походов</span>
             </div>
 
-            <!-- Интерактивный столбчатый график (Stacked Bar Chart) -->
+            <!-- Интерактивный столбчатый график -->
             <div class="relative bg-warmGray/60 rounded-2xl p-3 pt-6 border border-stone-200/50">
-                <!-- Всплывающая подсказка (Tooltip) -->
-                <div id="chart-tooltip" class="hidden pointer-events-none absolute z-20 top-2 left-1/2 -translate-x-1/2 bg-stone-800/95 text-white px-3.5 py-2 rounded-2xl shadow-lg text-xs whitespace-nowrap transition-all duration-150">
-                    <!-- Контент тултипа подставляется через JS -->
-                </div>
-
-                <!-- Контейнер столбиков -->
-                <div id="bar-chart-container" class="h-44 flex items-end justify-between gap-1 sm:gap-1.5 pt-4 pb-1 px-1 select-none">
-                    <!-- Столбики рендерятся через JS -->
-                </div>
-
-                <!-- Подписи оси X (даты) -->
-                <div id="bar-chart-labels" class="flex items-center justify-between text-[10px] font-semibold text-stone-400 mt-1.5 px-1">
-                    <!-- Даты рендерятся через JS -->
-                </div>
+                <div id="chart-tooltip" class="hidden pointer-events-none absolute z-20 top-2 left-1/2 -translate-x-1/2 bg-stone-800/95 text-white px-3.5 py-2 rounded-2xl shadow-lg text-xs whitespace-nowrap transition-all duration-150"></div>
+                <div id="bar-chart-container" class="h-44 flex items-end justify-between gap-1 sm:gap-1.5 pt-4 pb-1 px-1 select-none"></div>
+                <div id="bar-chart-labels" class="flex items-center justify-between text-[10px] font-semibold text-stone-400 mt-1.5 px-1"></div>
             </div>
 
-            <!-- Второй блок визуализации: Пончиковая диаграмма и сравнение за период -->
+            <!-- Пончиковая диаграмма и сравнение за период -->
             <div class="mt-4 pt-4 border-t border-stone-100 grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
-                <!-- Пончиковая диаграмма (SVG Donut Chart) -->
                 <div class="flex items-center gap-4 bg-warmGray/50 p-3.5 rounded-2xl border border-stone-200/40">
                     <div class="relative w-20 h-20 shrink-0 flex items-center justify-center">
                         <svg class="w-20 h-20 -rotate-90" viewBox="0 0 36 36">
-                            <!-- Фон круга (Лоток) -->
                             <circle cx="18" cy="18" r="14" fill="none" stroke="#FDE68A" stroke-width="4.5"></circle>
-                            <!-- Сегмент успеха (Унитаз) -->
                             <circle id="donut-toilet-arc" cx="18" cy="18" r="14" fill="none" stroke="#10B981" stroke-width="4.5"
                                 stroke-dasharray="0 100" stroke-linecap="round" class="transition-all duration-500"></circle>
                         </svg>
@@ -398,11 +372,8 @@
                     </div>
                 </div>
 
-                <!-- Сравнение Компота и Коржика за выбранный период -->
                 <div class="bg-warmGray/50 p-3.5 rounded-2xl border border-stone-200/40 space-y-2.5">
                     <div class="font-display font-bold text-sm text-stone-800">Рейтинг за период</div>
-                    
-                    <!-- Полоска Компота -->
                     <div>
                         <div class="flex justify-between text-xs mb-1">
                             <span class="font-semibold text-stone-700">Компот</span>
@@ -412,8 +383,6 @@
                             <div id="period-kompot-bar" class="h-full bg-kompot rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
                     </div>
-
-                    <!-- Полоска Коржика -->
                     <div>
                         <div class="flex justify-between text-xs mb-1">
                             <span class="font-semibold text-stone-700">Коржик</span>
@@ -438,14 +407,12 @@
 
             <!-- Панель фильтров -->
             <div class="bg-white rounded-2xl p-2.5 shadow-xs border border-stone-200/60 mb-4 space-y-2">
-                <!-- Фильтр по коту -->
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5">
                     <span class="text-[11px] font-semibold text-stone-400 px-1.5 shrink-0">Кот:</span>
                     <button onclick="setFilter('cat', 'all')" data-filter-cat="all" class="filter-cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-stone-800 text-white transition">Все</button>
                     <button onclick="setFilter('cat', 'Компот')" data-filter-cat="Компот" class="filter-cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-stone-100 text-stone-600 hover:bg-stone-200 transition">Компот</button>
                     <button onclick="setFilter('cat', 'Коржик')" data-filter-cat="Коржик" class="filter-cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-stone-100 text-stone-600 hover:bg-stone-200 transition">Коржик</button>
                 </div>
-                <!-- Фильтр по месту -->
                 <div class="flex items-center gap-1.5 overflow-x-auto">
                     <span class="text-[11px] font-semibold text-stone-400 px-1.5 shrink-0">Место:</span>
                     <button onclick="setFilter('place', 'all')" data-filter-place="all" class="filter-place-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-stone-800 text-white transition">Все</button>
@@ -454,12 +421,8 @@
                 </div>
             </div>
 
-            <!-- Список записей -->
-            <div id="entries-list" class="space-y-2.5">
-                <!-- Карточки рендерятся через JS -->
-            </div>
+            <div id="entries-list" class="space-y-2.5"></div>
 
-            <!-- Пустое состояние -->
             <div id="empty-state" class="hidden bg-white rounded-3xl p-8 text-center border border-stone-200/60">
                 <div class="w-14 h-14 rounded-full bg-warmGray mx-auto flex items-center justify-center text-stone-400 mb-3">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
@@ -472,29 +435,25 @@
     </div>
 
     <script>
-        // Ключ для сохранения в localStorage
         const STORAGE_KEY = 'cat_potty_tracker_entries_v2';
 
-        // Текущее состояние формы, графиков и фильтров
         let state = {
             selectedCat: 'Компот',
             selectedPlace: 'Унитаз',
             filterCat: 'all',
             filterPlace: 'all',
-            chartPeriod: 7, // 7 или 30 дней
-            chartCat: 'all', // 'all', 'Компот', 'Коржик'
+            chartPeriod: 7,
+            chartCat: 'all',
             activeDayIndex: null,
             entries: []
         };
 
-        // Инициализация приложения при загрузке
         window.addEventListener('DOMContentLoaded', () => {
             setCurrentDateTime();
             loadEntries();
             renderAll();
         });
 
-        // Установка текущей местной даты и времени в поля ввода
         function setCurrentDateTime() {
             const now = new Date();
             const year = now.getFullYear();
@@ -509,7 +468,6 @@
             if (timeInput) timeInput.value = `${hours}:${minutes}`;
         }
 
-        // Загрузка записей из localStorage или генерация демо-данных при первом запуске
         function loadEntries() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
@@ -527,39 +485,27 @@
             saveEntries();
         }
 
-        // Создание демонстрационных записей за последние 30 дней с наглядным прогрессом
         function createDemoEntries() {
             const entries = [];
             const now = new Date();
-            
-            // Генерируем записи за последние 30 дней, показывая рост приучения к унитазу
             for (let dayOffset = 29; dayOffset >= 0; dayOffset--) {
                 const baseDate = new Date(now);
                 baseDate.setDate(now.getDate() - dayOffset);
-                
-                // Прогресс от 0 (30 дней назад) до 1 (сегодня)
                 const progress = (29 - dayOffset) / 29;
-                
-                // Вероятность попасть в унитаз растет со временем
-                const kompotToiletProb = 0.25 + progress * 0.65; // с 25% до 90%
-                const korzhikToiletProb = 0.15 + progress * 0.60; // с 15% до 75%
+                const kompotToiletProb = 0.25 + progress * 0.65;
+                const korzhikToiletProb = 0.15 + progress * 0.60;
 
-                // Компот ходит 2-3 раза в день
                 const kompotTimes = dayOffset % 3 === 0 ? 3 : 2;
                 for (let i = 0; i < kompotTimes; i++) {
                     const hour = 7 + i * 6 + (dayOffset % 2);
                     const min = (dayOffset * 13 + i * 17) % 60;
                     const d = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), hour, min);
                     if (d.getTime() > now.getTime()) continue;
-
-                    // Детерминированный выбор места на основе прогресса
                     const hash = ((dayOffset * 7 + i * 19) % 100) / 100;
-                    const place = hash < kompotToiletProb ? 'Унитаз' : 'Лоток';
-                    
                     entries.push({
                         id: `demo-kmp-${dayOffset}-${i}`,
                         cat: 'Компот',
-                        place: place,
+                        place: hash < kompotToiletProb ? 'Унитаз' : 'Лоток',
                         date: toLocalYMD(d),
                         time: `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`,
                         timestamp: d.getTime(),
@@ -567,21 +513,17 @@
                     });
                 }
 
-                // Коржик ходит 2-3 раза в день
                 const korzhikTimes = dayOffset % 4 === 1 ? 3 : 2;
                 for (let i = 0; i < korzhikTimes; i++) {
                     const hour = 8 + i * 6 + ((dayOffset + 1) % 2);
                     const min = (dayOffset * 23 + i * 11) % 60;
                     const d = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), hour, min);
                     if (d.getTime() > now.getTime()) continue;
-
                     const hash = ((dayOffset * 11 + i * 29 + 37) % 100) / 100;
-                    const place = hash < korzhikToiletProb ? 'Унитаз' : 'Лоток';
-
                     entries.push({
                         id: `demo-krz-${dayOffset}-${i}`,
                         cat: 'Коржик',
-                        place: place,
+                        place: hash < korzhikToiletProb ? 'Унитаз' : 'Лоток',
                         date: toLocalYMD(d),
                         time: `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`,
                         timestamp: d.getTime(),
@@ -589,16 +531,13 @@
                     });
                 }
             }
-
             return entries.sort((a, b) => b.timestamp - a.timestamp);
         }
 
-        // Вспомогательная функция форматирования Date -> YYYY-MM-DD
         function toLocalYMD(d) {
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         }
 
-        // Сохранение в localStorage
         function saveEntries() {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(state.entries));
@@ -607,7 +546,6 @@
             }
         }
 
-        // Выбор кота в форме
         function selectCat(catName) {
             state.selectedCat = catName;
             const btnKompot = document.getElementById('btn-cat-kompot');
@@ -628,7 +566,6 @@
             }
         }
 
-        // Выбор места в форме
         function selectPlace(placeName) {
             state.selectedPlace = placeName;
             const btnToilet = document.getElementById('btn-place-toilet');
@@ -643,7 +580,6 @@
             }
         }
 
-        // Обработка отправки формы
         document.getElementById('entry-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const dateVal = document.getElementById('input-date').value;
@@ -666,7 +602,6 @@
             };
 
             state.entries.unshift(newEntry);
-            // Сортируем по убыванию даты/времени (сначала новые)
             state.entries.sort((a, b) => b.timestamp - a.timestamp);
             
             saveEntries();
@@ -677,7 +612,6 @@
             showToast(`${emoji} Записано: ${newEntry.cat} → ${newEntry.place}`);
         });
 
-        // Установка фильтров
         function setFilter(type, value) {
             if (type === 'cat') {
                 state.filterCat = value;
@@ -699,7 +633,6 @@
             renderEntriesList();
         }
 
-        // Переключение периода графика (7 или 30 дней)
         function setChartPeriod(days) {
             state.chartPeriod = days;
             state.activeDayIndex = null;
@@ -715,7 +648,6 @@
             renderCharts();
         }
 
-        // Переключение фильтра кота для графика
         function setChartCat(cat) {
             state.chartCat = cat;
             state.activeDayIndex = null;
@@ -733,13 +665,11 @@
             renderCharts();
         }
 
-        // Обновление всего интерфейса
         function renderAll() {
             renderStats();
             renderCharts();
             renderEntriesList();
             
-            // Показываем кнопку очистки демо-данных, если они есть
             const hasDemo = state.entries.some(e => e.isDemo);
             const clearDemoBtn = document.getElementById('btn-clear-demo');
             if (hasDemo) {
@@ -749,7 +679,6 @@
             }
         }
 
-        // Отрисовка графиков за неделю или месяц
         let currentChartDaysData = [];
 
         function renderCharts() {
@@ -757,13 +686,11 @@
             const now = new Date();
             const daysData = [];
 
-            // Собираем массив дней от (daysCount - 1) дней назад до сегодня
             for (let i = daysCount - 1; i >= 0; i--) {
                 const d = new Date(now);
                 d.setDate(now.getDate() - i);
                 const ymd = toLocalYMD(d);
                 
-                // Фильтруем записи за этот день и по выбранному коту
                 const dayEntries = state.entries.filter(e => {
                     const matchDate = e.date === ymd;
                     const matchCat = state.chartCat === 'all' || e.cat === state.chartCat;
@@ -787,14 +714,11 @@
             }
 
             currentChartDaysData = daysData;
-
-            // Находим максимальное количество походов в день для масштабирования столбиков
             const maxDailyTotal = Math.max(4, ...daysData.map(d => d.total));
             
             const container = document.getElementById('bar-chart-container');
             const labelsContainer = document.getElementById('bar-chart-labels');
 
-            // Рендерим столбики
             container.innerHTML = daysData.map((day, idx) => {
                 const toiletHeightPct = (day.toilet / maxDailyTotal) * 100;
                 const litterHeightPct = (day.litter / maxDailyTotal) * 100;
@@ -803,19 +727,15 @@
                 return `
                     <div onclick="handleBarInteraction(${idx})" onmouseenter="handleBarInteraction(${idx})"
                         class="group relative flex-1 h-full flex flex-col justify-end items-center cursor-pointer pt-2">
-                        
-                        <!-- Подсветка колонки при наведении/выборе -->
                         <div class="w-full max-w-[26px] h-full flex flex-col justify-end rounded-t-lg overflow-hidden transition-transform duration-150 ${isSelected ? 'ring-2 ring-stone-800 scale-105' : 'group-hover:scale-105'}">
                             ${day.total === 0 ? `
                                 <div class="w-full h-1.5 bg-stone-200/70 rounded-full"></div>
                             ` : `
-                                <!-- Верхняя часть столбика: Унитаз (изумрудный) -->
                                 ${day.toilet > 0 ? `
                                     <div style="height: ${toiletHeightPct}%" 
                                         class="w-full bg-emerald-500 transition-all duration-300 ${day.litter > 0 ? 'border-b border-white/40' : ''}">
                                     </div>
                                 ` : ''}
-                                <!-- Нижняя часть столбика: Лоток (песочно-янтарный) -->
                                 ${day.litter > 0 ? `
                                     <div style="height: ${litterHeightPct}%" 
                                         class="w-full bg-amber-300 transition-all duration-300">
@@ -827,18 +747,15 @@
                 `;
             }).join('');
 
-            // Рендерим подписи оси X
             if (daysCount === 7) {
                 labelsContainer.innerHTML = daysData.map(d => `<span class="flex-1 text-center">${d.shortLabel}</span>`).join('');
             } else {
-                // Для 30 дней показываем каждую 5-ю дату и последний день, чтобы не слипались
                 labelsContainer.innerHTML = daysData.map((d, idx) => {
                     const show = idx === 0 || idx === daysCount - 1 || idx % 5 === 0;
                     return `<span class="flex-1 text-center whitespace-nowrap">${show ? d.shortLabel : ''}</span>`;
                 }).join('');
             }
 
-            // Обновляем сводку за период и пончиковую диаграмму
             const periodToilet = daysData.reduce((sum, d) => sum + d.toilet, 0);
             const periodLitter = daysData.reduce((sum, d) => sum + d.litter, 0);
             const periodTotal = periodToilet + periodLitter;
@@ -849,12 +766,10 @@
             document.getElementById('donut-toilet-count').textContent = `${periodToilet} раз`;
             document.getElementById('donut-litter-count').textContent = `${periodLitter} раз`;
 
-            // Длина окружности r=14 равна 2 * PI * 14 ≈ 87.96
             const circumference = 87.96;
             const arcLength = (periodRate / 100) * circumference;
             document.getElementById('donut-toilet-arc').setAttribute('stroke-dasharray', `${arcLength} ${circumference}`);
 
-            // Обновляем сравнительный рейтинг Компота и Коржика за выбранный период
             const startYmd = daysData[0].ymd;
             const endYmd = daysData[daysData.length - 1].ymd;
 
@@ -870,7 +785,6 @@
             });
         }
 
-        // Форматирование короткой подписи даты под графиком
         function formatShortChartDate(dateObj, daysCount) {
             if (daysCount === 7) {
                 const weekDays = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
@@ -881,7 +795,6 @@
             return `${day}.${month}`;
         }
 
-        // Обработка клика или наведения на столбик графика
         function handleBarInteraction(index) {
             const day = currentChartDaysData[index];
             if (!day) return;
@@ -906,7 +819,6 @@
             if (tooltip) tooltip.classList.add('hidden');
         }
 
-        // Расчет и отрисовка статистики
         function renderStats() {
             const total = state.entries.length;
             document.getElementById('total-count-badge').textContent = `Всего: ${total}`;
@@ -926,7 +838,6 @@
             });
         }
 
-        // Склонение слова "раз"
         function pluralizeTimes(n) {
             const mod10 = n % 10;
             const mod100 = n % 100;
@@ -936,7 +847,6 @@
             return 'раз';
         }
 
-        // Форматирование даты для красивого отображения
         function formatDisplayDate(dateStr) {
             const today = new Date();
             const yesterday = new Date(today);
@@ -954,7 +864,6 @@
             return `${parseInt(parts[2], 10)} ${months[monthIdx] || parts[1]}`;
         }
 
-        // Отрисовка списка записей
         function renderEntriesList() {
             const listContainer = document.getElementById('entries-list');
             const emptyState = document.getElementById('empty-state');
@@ -993,13 +902,11 @@
                 return `
                     <div class="bg-white rounded-2xl p-3.5 shadow-xs border border-stone-200/60 flex items-center justify-between gap-3 animate-slide-in">
                         <div class="flex items-center gap-3 min-w-0">
-                            <!-- Метка кота -->
                             <div class="px-3 py-1.5 rounded-xl border ${catBadgeClass} flex items-center gap-1.5 shrink-0">
                                 <span class="w-2 h-2 rounded-full ${catDotClass}"></span>
                                 <span class="font-display font-bold text-sm">${entry.cat}</span>
                             </div>
 
-                            <!-- Метка места -->
                             <div class="px-2.5 py-1.5 rounded-xl ${placeBadgeClass} flex items-center gap-1.5 shrink-0">
                                 ${placeIcon}
                                 <span class="font-semibold text-xs">${entry.place}</span>
@@ -1009,13 +916,11 @@
                         </div>
 
                         <div class="flex items-center gap-2.5 shrink-0">
-                            <!-- Дата и время -->
                             <div class="text-right">
                                 <div class="font-display font-bold text-sm text-stone-800 leading-tight">${entry.time}</div>
                                 <div class="text-[11px] font-medium text-stone-400">${formatDisplayDate(entry.date)}</div>
                             </div>
 
-                            <!-- Кнопка удаления -->
                             <button onclick="confirmDeleteEntry('${entry.id}')" title="Удалить запись"
                                 class="p-2 rounded-xl text-stone-300 hover:text-rose-500 hover:bg-rose-50 transition active:scale-90">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -1028,7 +933,6 @@
             }).join('');
         }
 
-        // Модальное окно подтверждения (вместо системного confirm)
         let pendingConfirmAction = null;
 
         function openConfirmModal(title, text, onConfirm) {
@@ -1053,7 +957,6 @@
             closeConfirmModal();
         });
 
-        // Подтверждение удаления одной записи
         function confirmDeleteEntry(id) {
             const entry = state.entries.find(e => e.id === id);
             if (!entry) return;
@@ -1069,7 +972,6 @@
             );
         }
 
-        // Подтверждение очистки демо-данных
         function confirmClearDemo() {
             openConfirmModal(
                 'Очистить демо-данные?',
@@ -1083,7 +985,6 @@
             );
         }
 
-        // Всплывающее уведомление (Toast)
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -1103,33 +1004,16 @@
             }, 2500);
         }
 
-        // Экспорт данных в CSV или JSON
-        function exportData(format) {
+        // Экспорт резервной копии JSON
+        function exportData() {
             if (state.entries.length === 0) {
-                showToast('Нет записей для экспорта', 'error');
+                showToast('Нет записей для сохранения', 'error');
                 return;
             }
-
-            let content = '';
-            let mimeType = '';
-            let filename = '';
             const todayStr = new Date().toISOString().slice(0, 10);
-
-            if (format === 'csv') {
-                // Добавляем BOM для корректного открытия кириллицы в Excel
-                const bom = '\uFEFF';
-                const headers = ['Дата', 'Время', 'Кот', 'Место'];
-                const rows = state.entries.map(e => [e.date, e.time, e.cat, e.place].join(';'));
-                content = bom + [headers.join(';'), ...rows].join('\n');
-                mimeType = 'text/csv;charset=utf-8;';
-                filename = `kompot-korzhik-${todayStr}.csv`;
-            } else {
-                content = JSON.stringify(state.entries, null, 2);
-                mimeType = 'application/json;charset=utf-8;';
-                filename = `kompot-korzhik-${todayStr}.json`;
-            }
-
-            const blob = new Blob([content], { type: mimeType });
+            const filename = `kompot-korzhik-${todayStr}.json`;
+            const content = JSON.stringify(state.entries, null, 2);
+            const blob = new Blob([content], { type: 'application/json;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
@@ -1138,8 +1022,51 @@
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
+            showToast(`Копия ${filename} сохранена`);
+        }
 
-            showToast(`Файл ${filename} скачан`);
+        // Импорт данных из JSON
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    const list = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.entries) ? parsed.entries : null);
+                    if (!list) {
+                        showToast('Неверный формат файла JSON', 'error');
+                        return;
+                    }
+                    const imported = list.map((item, idx) => {
+                        const placeCap = String(item.place || '').toLowerCase() === 'унитаз' ? 'Унитаз' : 'Лоток';
+                        const ts = item.timestamp || new Date(`${item.date}T${item.time}`).getTime() || Date.now();
+                        return {
+                            id: item.id || `imp-${Date.now()}-${idx}`,
+                            cat: item.cat || 'Компот',
+                            place: placeCap,
+                            date: item.date,
+                            time: item.time,
+                            timestamp: ts,
+                            isDemo: false
+                        };
+                    });
+                    // Объединяем с уже имеющимися недемо-записями без дублей по дате+времени+коту
+                    const existingReal = state.entries.filter(en => !en.isDemo);
+                    const map = new Map();
+                    [...existingReal, ...imported].forEach(en => {
+                        map.set(`${en.date}_${en.time}_${en.cat}`, en);
+                    });
+                    state.entries = Array.from(map.values()).sort((a, b) => b.timestamp - a.timestamp);
+                    saveEntries();
+                    renderAll();
+                    showToast(`Загружено записей: ${imported.length}`);
+                } catch (err) {
+                    showToast('Ошибка чтения файла', 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
         }
     </script>
 </body>
