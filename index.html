@@ -114,7 +114,7 @@
 
             <!-- Кнопки Копия и Импорт -->
             <div class="flex gap-1.5">
-                <button onclick="exportData('json')" title="Скачать резервную копию" class="p-2.5 rounded-xl bg-white hover:bg-stone-50 text-stone-600 border border-stone-200/80 shadow-xs text-xs font-semibold flex items-center gap-1 transition active:scale-95">
+                <button onclick="exportData()" title="Скачать резервную копию" class="p-2.5 rounded-xl bg-white hover:bg-stone-50 text-stone-600 border border-stone-200/80 shadow-xs text-xs font-semibold flex items-center gap-1 transition active:scale-95">
                     <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     <span>Копия</span>
                 </button>
@@ -332,11 +332,26 @@
                 <span id="chart-period-summary" class="font-semibold text-stone-600">0 походов</span>
             </div>
 
-            <!-- Интерактивный столбчатый график -->
-            <div class="relative bg-warmGray/60 rounded-2xl p-3 pt-6 border border-stone-200/50">
-                <div id="chart-tooltip" class="hidden pointer-events-none absolute z-20 top-2 left-1/2 -translate-x-1/2 bg-stone-800/95 text-white px-3.5 py-2 rounded-2xl shadow-lg text-xs whitespace-nowrap transition-all duration-150"></div>
-                <div id="bar-chart-container" class="h-44 flex items-end justify-between gap-1 sm:gap-1.5 pt-4 pb-1 px-1 select-none"></div>
-                <div id="bar-chart-labels" class="flex items-center justify-between text-[10px] font-semibold text-stone-400 mt-1.5 px-1"></div>
+            <!-- Интерактивный столбчатый график с осью Y слева -->
+            <div class="relative bg-warmGray/60 rounded-2xl p-3 pt-7 border border-stone-200/50">
+                <div id="chart-tooltip" class="hidden pointer-events-none absolute z-20 top-1.5 left-1/2 -translate-x-1/2 bg-stone-800/95 text-white px-3.5 py-1.5 rounded-2xl shadow-lg text-xs whitespace-nowrap transition-all duration-150"></div>
+                
+                <div class="flex items-stretch gap-2">
+                    <!-- Вертикальная ось с цифрами слева (1, 2, 3, 4, 5...) -->
+                    <div id="bar-chart-yaxis" class="relative w-5 h-44 shrink-0 select-none"></div>
+                    
+                    <!-- Область сетки и столбиков -->
+                    <div class="relative flex-1 h-44">
+                        <div id="bar-chart-grid" class="absolute inset-0 pointer-events-none"></div>
+                        <div id="bar-chart-container" class="relative z-10 h-full flex items-end justify-between gap-1 sm:gap-1.5 px-1 select-none"></div>
+                    </div>
+                </div>
+
+                <!-- Подписи дат снизу со сдвигом под ось Y -->
+                <div class="flex items-center gap-2 mt-1.5">
+                    <div class="w-5 shrink-0"></div>
+                    <div id="bar-chart-labels" class="flex-1 flex items-center justify-between text-[10px] font-semibold text-stone-400 px-1"></div>
+                </div>
             </div>
 
             <!-- Пончиковая диаграмма и сравнение за период -->
@@ -714,11 +729,28 @@
             }
 
             currentChartDaysData = daysData;
-            const maxDailyTotal = Math.max(4, ...daysData.map(d => d.total));
+            // Минимум 5 делений (1, 2, 3, 4, 5), если походов больше — расширяется автоматически
+            const maxDailyTotal = Math.max(5, ...daysData.map(d => d.total));
             
+            const yAxisContainer = document.getElementById('bar-chart-yaxis');
+            const gridContainer = document.getElementById('bar-chart-grid');
             const container = document.getElementById('bar-chart-container');
             const labelsContainer = document.getElementById('bar-chart-labels');
 
+            // Рисуем цифры 1, 2, 3, 4, 5... слева и горизонтальные линии сетки
+            let yAxisHtml = '';
+            let gridHtml = '';
+            for (let v = 1; v <= maxDailyTotal; v++) {
+                const bottomPct = (v / maxDailyTotal) * 100;
+                yAxisHtml += `<span style="bottom: ${bottomPct}%" class="absolute right-1 translate-y-1/2 text-[10px] font-bold text-stone-400 leading-none">${v}</span>`;
+                gridHtml += `<div style="bottom: ${bottomPct}%" class="absolute left-0 right-0 border-b border-dashed border-stone-300/70"></div>`;
+            }
+            // Нулевая базовая линия снизу
+            gridHtml += `<div class="absolute bottom-0 left-0 right-0 border-b border-stone-300"></div>`;
+            yAxisContainer.innerHTML = yAxisHtml;
+            gridContainer.innerHTML = gridHtml;
+
+            // Рендерим столбики
             container.innerHTML = daysData.map((day, idx) => {
                 const toiletHeightPct = (day.toilet / maxDailyTotal) * 100;
                 const litterHeightPct = (day.litter / maxDailyTotal) * 100;
@@ -726,10 +758,10 @@
 
                 return `
                     <div onclick="handleBarInteraction(${idx})" onmouseenter="handleBarInteraction(${idx})"
-                        class="group relative flex-1 h-full flex flex-col justify-end items-center cursor-pointer pt-2">
+                        class="group relative flex-1 h-full flex flex-col justify-end items-center cursor-pointer">
                         <div class="w-full max-w-[26px] h-full flex flex-col justify-end rounded-t-lg overflow-hidden transition-transform duration-150 ${isSelected ? 'ring-2 ring-stone-800 scale-105' : 'group-hover:scale-105'}">
                             ${day.total === 0 ? `
-                                <div class="w-full h-1.5 bg-stone-200/70 rounded-full"></div>
+                                <div class="w-full h-1 bg-stone-300/60 rounded-full"></div>
                             ` : `
                                 ${day.toilet > 0 ? `
                                     <div style="height: ${toiletHeightPct}%" 
@@ -1004,7 +1036,6 @@
             }, 2500);
         }
 
-        // Экспорт резервной копии JSON
         function exportData() {
             if (state.entries.length === 0) {
                 showToast('Нет записей для сохранения', 'error');
@@ -1025,7 +1056,6 @@
             showToast(`Копия ${filename} сохранена`);
         }
 
-        // Импорт данных из JSON
         function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1051,7 +1081,6 @@
                             isDemo: false
                         };
                     });
-                    // Объединяем с уже имеющимися недемо-записями без дублей по дате+времени+коту
                     const existingReal = state.entries.filter(en => !en.isDemo);
                     const map = new Map();
                     [...existingReal, ...imported].forEach(en => {
