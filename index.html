@@ -72,6 +72,158 @@
             background: #E2D6CC;
             border-radius: 10px;
         }
+
+        /* Собственное окно выбора времени и объёмные кнопки */
+        .time-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(28, 25, 23, 0.45);
+            backdrop-filter: blur(3px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+            z-index: 60;
+        }
+        .time-modal-backdrop.is-open {
+            display: flex;
+        }
+        .time-picker-card {
+            width: 100%;
+            max-width: 350px;
+            background: #FDF8F3;
+            border-radius: 24px;
+            padding: 16px;
+            border: 2px solid #FDBA74;
+            box-shadow: 0 18px 40px rgba(28, 25, 23, 0.25);
+            box-sizing: border-box;
+        }
+        .time-picker-display {
+            background: linear-gradient(135deg, #F97316, #F59E0B);
+            color: #FFFFFF;
+            border-radius: 18px;
+            padding: 10px 14px;
+            text-align: center;
+            font-family: 'Nunito', sans-serif;
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 0 #C2410C;
+        }
+        .time-quick-now {
+            width: 100%;
+            padding: 8px 10px;
+            margin-bottom: 10px;
+            border-radius: 14px;
+            border: 1px solid #FDBA74;
+            background: #FFF0E5;
+            color: #C2410C;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #FB923C;
+            transition: transform 0.08s ease;
+        }
+        .time-quick-now:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #FB923C;
+        }
+        .time-picker-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .time-col-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #78716C;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .time-scroll-list {
+            max-height: 156px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            padding: 6px;
+            background: #FFFFFF;
+            border-radius: 16px;
+            border: 1px solid #E7E5E4;
+        }
+        .time-slot-btn {
+            padding: 7px 2px;
+            border-radius: 10px;
+            border: 1px solid #E7E5E4;
+            background: #FAF8F5;
+            color: #292524;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #D6D3D1;
+            transition: transform 0.08s ease;
+        }
+        .time-slot-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #D6D3D1;
+        }
+        .time-slot-btn.is-selected {
+            background: #F97316;
+            color: #FFFFFF;
+            border-color: #EA580C;
+            box-shadow: 0 3px 0 #C2410C;
+        }
+        .time-picker-actions {
+            display: flex;
+            align-items: stretch;
+            gap: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .time-3d-btn {
+            flex: 1 1 0;
+            min-width: 0;
+            padding: 10px 4px;
+            border-radius: 14px;
+            border: none;
+            font-family: 'Nunito', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: transform 0.08s ease;
+        }
+        .time-3d-btn:active {
+            transform: translateY(3px);
+        }
+        .time-btn-clear {
+            background: #FEE2E2;
+            color: #B91C1C;
+            box-shadow: 0 4px 0 #F87171;
+        }
+        .time-btn-clear:active {
+            box-shadow: 0 1px 0 #F87171;
+        }
+        .time-btn-cancel {
+            background: #E7E5E4;
+            color: #292524;
+            box-shadow: 0 4px 0 #A8A29E;
+        }
+        .time-btn-cancel:active {
+            box-shadow: 0 1px 0 #A8A29E;
+        }
+        .time-btn-apply {
+            background: #22C55E;
+            color: #FFFFFF;
+            box-shadow: 0 4px 0 #15803D;
+        }
+        .time-btn-apply:active {
+            box-shadow: 0 1px 0 #15803D;
+        }
     </style>
 </head>
 <body class="bg-cream text-stone-800 min-h-screen pb-12 selection:bg-orange-200">
@@ -212,8 +364,8 @@
                                 class="w-full px-3.5 py-2.5 rounded-2xl bg-warmGray border border-stone-200/80 text-stone-800 font-medium text-sm focus:outline-none focus:border-orange-400 focus:bg-white transition">
                         </div>
                         <div class="relative">
-                            <input type="time" id="input-time" required
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-warmGray border border-stone-200/80 text-stone-800 font-medium text-sm focus:outline-none focus:border-orange-400 focus:bg-white transition">
+                            <input type="text" id="input-time" readonly required onclick="openCustomTimePicker(this)"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-warmGray border border-stone-200/80 text-stone-800 font-medium text-sm cursor-pointer focus:outline-none focus:border-orange-400 focus:bg-white transition">
                         </div>
                     </div>
                 </div>
@@ -449,6 +601,34 @@
 
     </div>
 
+    <!-- Собственное окно выбора времени -->
+    <div id="customTimeModal" class="time-modal-backdrop" role="dialog" aria-modal="true" onclick="if(event.target===this)closeTimePicker()">
+        <div class="time-picker-card">
+            <div id="timePickerPreview" class="time-picker-display">17:09</div>
+
+            <button type="button" class="time-quick-now" onclick="setNowInPicker()">
+                🕒 Сейчас
+            </button>
+
+            <div class="time-picker-grid">
+                <div>
+                    <div class="time-col-label">Часы</div>
+                    <div id="hoursList" class="time-scroll-list"></div>
+                </div>
+                <div>
+                    <div class="time-col-label">Минуты</div>
+                    <div id="minutesList" class="time-scroll-list"></div>
+                </div>
+            </div>
+
+            <div class="time-picker-actions">
+                <button type="button" class="time-3d-btn time-btn-clear" onclick="clearTimePicker()">Очистить</button>
+                <button type="button" class="time-3d-btn time-btn-cancel" onclick="closeTimePicker()">Отмена</button>
+                <button type="button" class="time-3d-btn time-btn-apply" onclick="applyTimePicker()">Установить</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const STORAGE_KEY = 'cat_potty_tracker_entries_v2';
 
@@ -481,6 +661,92 @@
             const timeInput = document.getElementById('input-time');
             if (dateInput) dateInput.value = `${year}-${month}-${day}`;
             if (timeInput) timeInput.value = `${hours}:${minutes}`;
+        }
+
+        let activeTimeInput = null;
+        let selectedHour = '17';
+        let selectedMinute = '09';
+
+        function renderTimeLists() {
+            const hoursEl = document.getElementById('hoursList');
+            const minsEl = document.getElementById('minutesList');
+            hoursEl.innerHTML = '';
+            minsEl.innerHTML = '';
+
+            for (let h = 0; h < 24; h++) {
+                const hh = String(h).padStart(2, '0');
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'time-slot-btn' + (hh === selectedHour ? ' is-selected' : '');
+                btn.textContent = hh;
+                btn.onclick = () => {
+                    selectedHour = hh;
+                    updateTimePickerUI();
+                };
+                hoursEl.appendChild(btn);
+            }
+
+            for (let m = 0; m < 60; m++) {
+                const mm = String(m).padStart(2, '0');
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'time-slot-btn' + (mm === selectedMinute ? ' is-selected' : '');
+                btn.textContent = mm;
+                btn.onclick = () => {
+                    selectedMinute = mm;
+                    updateTimePickerUI();
+                };
+                minsEl.appendChild(btn);
+            }
+        }
+
+        function updateTimePickerUI() {
+            document.getElementById('timePickerPreview').textContent = `${selectedHour}:${selectedMinute}`;
+            renderTimeLists();
+        }
+
+        function openCustomTimePicker(inputEl) {
+            activeTimeInput = inputEl;
+            const currentVal = (inputEl.value || '').trim();
+            const match = currentVal.match(/^(\d{1,2}):(\d{2})$/);
+            if (match) {
+                selectedHour = String(Math.min(23, parseInt(match[1], 10))).padStart(2, '0');
+                selectedMinute = String(Math.min(59, parseInt(match[2], 10))).padStart(2, '0');
+            } else {
+                const now = new Date();
+                selectedHour = String(now.getHours()).padStart(2, '0');
+                selectedMinute = String(now.getMinutes()).padStart(2, '0');
+            }
+            updateTimePickerUI();
+            document.getElementById('customTimeModal').classList.add('is-open');
+        }
+
+        function closeTimePicker() {
+            document.getElementById('customTimeModal').classList.remove('is-open');
+            activeTimeInput = null;
+        }
+
+        function setNowInPicker() {
+            const now = new Date();
+            selectedHour = String(now.getHours()).padStart(2, '0');
+            selectedMinute = String(now.getMinutes()).padStart(2, '0');
+            updateTimePickerUI();
+        }
+
+        function clearTimePicker() {
+            if (activeTimeInput) {
+                activeTimeInput.value = '';
+                activeTimeInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            closeTimePicker();
+        }
+
+        function applyTimePicker() {
+            if (activeTimeInput) {
+                activeTimeInput.value = `${selectedHour}:${selectedMinute}`;
+                activeTimeInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            closeTimePicker();
         }
 
         function loadEntries() {
@@ -729,7 +995,6 @@
             }
 
             currentChartDaysData = daysData;
-            // Минимум 5 делений (1, 2, 3, 4, 5), если походов больше — расширяется автоматически
             const maxDailyTotal = Math.max(5, ...daysData.map(d => d.total));
             
             const yAxisContainer = document.getElementById('bar-chart-yaxis');
@@ -737,7 +1002,6 @@
             const container = document.getElementById('bar-chart-container');
             const labelsContainer = document.getElementById('bar-chart-labels');
 
-            // Рисуем цифры 1, 2, 3, 4, 5... слева и горизонтальные линии сетки
             let yAxisHtml = '';
             let gridHtml = '';
             for (let v = 1; v <= maxDailyTotal; v++) {
@@ -745,12 +1009,10 @@
                 yAxisHtml += `<span style="bottom: ${bottomPct}%" class="absolute right-1 translate-y-1/2 text-[10px] font-bold text-stone-400 leading-none">${v}</span>`;
                 gridHtml += `<div style="bottom: ${bottomPct}%" class="absolute left-0 right-0 border-b border-dashed border-stone-300/70"></div>`;
             }
-            // Нулевая базовая линия снизу
             gridHtml += `<div class="absolute bottom-0 left-0 right-0 border-b border-stone-300"></div>`;
             yAxisContainer.innerHTML = yAxisHtml;
             gridContainer.innerHTML = gridHtml;
 
-            // Рендерим столбики
             container.innerHTML = daysData.map((day, idx) => {
                 const toiletHeightPct = (day.toilet / maxDailyTotal) * 100;
                 const litterHeightPct = (day.litter / maxDailyTotal) * 100;
